@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceTracker - Prototipo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .iphone-frame {
+            width: 375px;
+            height: 812px;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #f8f9fa;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 209px;
+            height: 30px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .app-content {
+            padding: 20px;
+            height: calc(100% - 140px);
+            overflow-y: auto;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 90px;
+            background: #fff;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 25px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #007AFF;
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .greeting {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .balance-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .positive { color: #28a745; }
+        .negative { color: #dc3545; }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+        }
+
+        .transaction-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+
+        .transaction-subtitle {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .transaction-amount {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .screen-content {
+            display: none;
+        }
+
+        .screen-content.active {
+            display: block;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .investment-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+
+        .investment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .investment-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .investment-return {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .investment-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="iphone-frame">
+        <div class="screen">
+            <div class="notch"></div>
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>🔋 87%</span>
+            </div>
+
+            <!-- Home Screen -->
+            <div class="screen-content active" id="home">
+                <div class="app-content">
+                    <div class="header">
+                        <div class="greeting">Ciao Marco! 👋</div>
+                        <div class="profile-pic">M</div>
+                    </div>
+
+                    <div class="balance-card">
+                        <div class="balance-label">Patrimonio Totale</div>
+                        <div class="balance-amount">€47,832</div>
+                        <div class="balance-change">
+                            <span>📈 +€1,234 (2.6%)</span>
+                        </div>
+                    </div>
+
+                    <div class="quick-stats">
+                        <div class="stat-card">
+                            <div class="stat-label">Spese Mese</div>
+                            <div class="stat-value">€2,156</div>
+                            <div class="stat-change negative">+€234 vs prev</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Investimenti</div>
+                            <div class="stat-value">€32,420</div>
+                            <div class="stat-change positive">+€892 questo mese</div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">Transazioni Recenti</div>
+                    <div class="transaction-item">
+                        <div class="transaction-icon" style="background: #FFE5E5; color: #FF6B6B;">🛒</div>
+                        <div class="transaction-details">
+                            <div class="transaction-title">Esselunga</div>
+                            <div class="transaction-subtitle">Oggi • Alimentari</div>
+                        </div>
+                        <div class="transaction-amount negative">-€67,50</div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-icon" style="background: #E5F7FF; color: #007AFF;">⚡</div>
+                        <div class="transaction-details">
+                            <div class="transaction-title">Enel Energia</div>
+                            <div class="transaction-subtitle">Ieri • Bollette</div>
+                        </div>
+                        <div class="transaction-amount negative">-€89,20</div>
+                    </div>
+                    <div class="transaction-item">
+                        <div class="transaction-icon" style="background: #E5FFE5; color: #28A745;">💰</div>
+                        <div class="transaction-details">
+                            <div class="transaction-title">Stipendio</div>
+                            <div class="transaction-subtitle">3 giorni fa • Lavoro</div>
+                        </div>
+                        <div class="transaction-amount positive">+€2,800,00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spese Screen -->
+            <div class="screen-content" id="expenses">
+                <div class="app-content">
+                    <div class="section-title">Spese per Categoria</div>
+                    <div class="category-grid">
+                        <div class="category-card">
+                            <div class="category-icon" style="background: #FFE5E5; color: #FF6B6B;">🛒</div>
+                            <div style="font-weight: 600;">Alimentari</div>
+                            <div style="color: #666; font-size: 12px;">€487 questo mese</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon" style="background: #E5F7FF; color: #007AFF;">⚡</div>
+                            <div style="font-weight: 600;">Bollette</div>
+                            <div style="color: #666; font-size: 12px;">€234 questo mese</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon" style="background: #FFF5E5; color: #FF8C00;">🚗</div>
+                            <div style="font-weight: 600;">Trasporti</div>
+                            <div style="color: #666; font-size: 12px;">€156 questo mese</div>
+                        </div>
+                        <div class="category-card">
+                            <div class="category-icon" style="background: #F0E5FF; color: #8A2BE2;">🎬</div>
+                            <div style="font-weight: 600;">Intrattenimento</div>
+                            <div style="color: #666; font-size: 12px;">€89 questo mese</div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">Budget Progress</div>
+                    <div class="stat-card">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span style="font-weight: 600;">Budget Mensile</span>
+                            <span style="font-weight: 600;">€2,156 / €2,500</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 86%"></div>
+                        </div>
+                        <div style="font-size: 12px; color: #28a745; margin-top: 5px;">
+                            Rimangono €344 per questo mese
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investimenti Screen -->
+            <div class="screen-content" id="investments">
+                <div class="app-content">
+                    <div class="balance-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                        <div class="balance-label">Portafoglio Investimenti</div>
+                        <div class="balance-amount">€32,420</div>
+                        <div class="balance-change">
+                            <span>📈 +€892 (+2.8%) questo mese</span>
+                        </div>
+                    </div>
+
+                    <div class="section-title">I Tuoi Investimenti</div>
+                    <div class="investment-card">
+                        <div class="investment-header">
+                            <div class="investment-name">VWCE - World ETF</div>
+                            <div class="investment-return positive">+€456 (+3.2%)</div>
+                        </div>
+                        <div class="investment-details">
+                            <span>Valore: €14,856</span>
+                            <span>Investito: €14,400</span>
+                        </div>
+                    </div>
+                    <div class="investment-card">
+                        <div class="investment-header">
+                            <div class="investment-name">SWDA - Developed World</div>
+                            <div class="investment-return positive">+€289 (+2.1%)</div>
+                        </div>
+                        <div class="investment-details">
+                            <span>Valore: €14,089</span>
+                            <span>Investito: €13,800</span>
+                        </div>
+                    </div>
+                    <div class="investment-card">
+                        <div class="investment-header">
+                            <div class="investment-name">Conto Deposito Fineco</div>
+                            <div class="investment-return positive">+€12 (4.2% annuo)</div>
+                        </div>
+                        <div class="investment-details">
+                            <span>Saldo: €3,475</span>
+                            <span>Rendimento annuo stimato: €147</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conti Screen -->
+            <div class="screen-content" id="accounts">
+                <div class="app-content">
+                    <div class="section-title">I Tuoi Conti</div>
+                    <div class="stat-card" style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; font-size: 16px;">UniCredit My Genius</div>
+                                <div style="color: #666; font-size: 12px;">Conto corrente principale</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; font-size: 20px;">€12,937</div>
+                                <div style="color: #28a745; font-size: 12px;">Ultimo aggiornamento: ora</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; font-size: 16px;">Buddybank</div>
+                                <div style="color: #666; font-size: 12px;">Conto di appoggio</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; font-size: 20px;">€2,475</div>
+                                <div style="color: #28a745; font-size: 12px;">Ultimo aggiornamento: ora</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title" style="margin-top: 30px;">Liquidità Disponibile</div>
+                    <div class="quick-stats">
+                        <div class="stat-card">
+                            <div class="stat-label">Libera</div>
+                            <div class="stat-value">€12,937</div>
+                            <div class="stat-change">Disponibile subito</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Vincolata</div>
+                            <div class="stat-value">€3,475</div>
+                            <div class="stat-change">Conto deposito</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="switchScreen('home')">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </div>
+                <div class="nav-item" onclick="switchScreen('expenses')">
+                    <div class="nav-icon">💳</div>
+                    <div class="nav-label">Spese</div>
+                </div>
+                <div class="nav-item" onclick="switchScreen('investments')">
+                    <div class="nav-icon">📈</div>
+                    <div class="nav-label">Investimenti</div>
+                </div>
+                <div class="nav-item" onclick="switchScreen('accounts')">
+                    <div class="nav-icon">🏦</div>
+                    <div class="nav-label">Conti</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen-content').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show selected screen
+            document.getElementById(screenId).classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+        }
+
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate real-time updates
+            setInterval(function() {
+                const balanceElement = document.querySelector('.balance-amount');
+                if (balanceElement) {
+                    const currentBalance = parseInt(balanceElement.textContent.replace(/[€,]/g, ''));
+                    const change = Math.floor(Math.random() * 10) - 5; // Random change between -5 and +5
+                    const newBalance = currentBalance + change;
+                    balanceElement.textContent = `€${newBalance.toLocaleString()}`;
+                }
+            }, 5000); // Update every 5 seconds
+        });
+    </script>
+</body>
+</html>
